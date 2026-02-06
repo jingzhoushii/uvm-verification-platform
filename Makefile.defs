@@ -1,7 +1,68 @@
-# Makefile.defs update
+# ============================================================
+# File: Makefile.defs
+# Description: 编译选项和环境变量定义
+# Author: UVM Verification Platform
+# Created: 2026-02-05
+# ============================================================
 
-# Original content
-# Other content...
+# ============================================================
+# 仿真工具配置
+# ============================================================
 
-# Fixed command
-rm -f novas*
+SIM_TOOL ?= vcs
+
+VCS_HOME       ?= /path/to/vcs
+NCSIM_HOME    ?= /path/to/ncsim
+XCELIUM_HOME  ?= /path/to/xcelium
+
+UVM_HOME      ?= /path/to/uvm-1800.2-2021
+
+# ============================================================
+# 目录配置
+# ============================================================
+
+ROOT_DIR   := $(dir $(abspath $(lastword $(MAKEFILE_LIST)))
+BUILD_DIR  := $(ROOT_DIR)/build/$(SIM_TOOL)
+SIM_DIR    := $(ROOT_DIR)/sim
+REGRESS_DIR := $(ROOT_DIR)/regress
+SCRIPTS_DIR := $(ROOT_DIR)/scripts
+DOCS_DIR  := $(ROOT_DIR)/docs
+SRC_DIR   := $(ROOT_DIR)/src
+TB_DIR    := $(ROOT_DIR)/tb
+COVERAGE_DIR := $(ROOT_DIR)/coverage
+
+# ============================================================
+# 编译选项 (VCS)
+# ============================================================
+
+VCS_FLAGS := -sverilog -ntb_opts uvm-1.2 -debug_access+all -lca +v2k +acc+b
+
+VCS_INC := -I$(UVM_HOME)/src -I$(SRC_DIR) -I$(TB_DIR)
+
+VCS_DEF := +define+UVM_NO_DEPRECATED +define+UVM_OBJECT_MUST_HAVE_CONSTRUCTOR
+
+# ============================================================
+# 编译选项 (NCsim)
+# ============================================================
+
+NCSIM_FLAGS := -sv -uvm -uvmhome $(UVM_HOME) -access +rwc -lca
+
+# ============================================================
+# 运行选项
+# ============================================================
+
+TEST    ?= smoke_test
+SEED    ?= 12345
+TIMEOUT ?= 300
+
+# ============================================================
+# 覆盖率选项
+# ============================================================
+
+COV_FLAGS := -cm line+cond+fsm+tgl+branch+assert
+
+# ============================================================
+# 文件列表
+# ============================================================
+
+FILELIST := $(ROOT_DIR)/filelist.f
