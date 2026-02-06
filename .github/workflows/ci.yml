@@ -24,23 +24,16 @@ jobs:
           ls -la
           echo ""
           echo "Testbench files:"
-          find tb -name "*.sv" 2>/dev/null || echo "No .sv files found"
+          find tb -name "*.sv" 2>/dev/null | head -20 || echo "No files"
           echo ""
-          echo "Makefile: $(test -f Makefile && echo 'EXISTS' || echo 'MISSING')"
-          echo "filelist.f: $(test -f filelist.f && echo 'EXISTS' || echo 'MISSING')"
+          test -f Makefile && echo "Makefile: EXISTS" || echo "Makefile: MISSING"
+          test -f filelist.f && echo "filelist.f: EXISTS" || echo "filelist.f: MISSING"
       
       - name: Check SystemVerilog files
         run: |
           echo "=== SystemVerilog Files ==="
-          echo "Found $(find tb -name '*.sv' 2>/dev/null | wc -l) .sv files"
-          find tb -name "*.sv" -o -name "*.v" 2>/dev/null | sort
-      
-      - name: Validate YAML and Makefile
-        run: |
-          echo "=== Configuration Files ==="
-          test -f regress/testlist.yaml && echo "testlist.yaml: EXISTS" || echo "testlist.yaml: MISSING"
-          echo "Makefile targets:"
-          grep -E "^[a-z_-]+:" Makefile 2>/dev/null | grep -v "^.PHONY" | head -10 || echo "No targets found"
+          find tb -name "*.sv" 2>/dev/null | wc -l | xargs echo "Found .sv files:"
+          find tb -name "*.sv" -o -name "*.v" 2>/dev/null | sort || echo "No files"
 
   compile:
     name: Compile Check
@@ -61,10 +54,10 @@ jobs:
       - name: List components
         run: |
           echo "=== Components ==="
-          echo "Agent: $(ls tb/agent/*.sv 2>/dev/null | wc -l) files"
-          echo "Component: $(ls tb/component/*.sv 2>/dev/null | wc -l) files"
-          echo "Sequence: $(ls tb/seq/*.sv 2>/dev/null | wc -l) files"
-          echo "Test: $(ls tb/test/*_test.sv 2>/dev/null | wc -l) files"
+          ls tb/agent/*.sv 2>/dev/null | wc -l | xargs echo "Agent files:"
+          ls tb/component/*.sv 2>/dev/null | wc -l | xargs echo "Component files:"
+          ls tb/seq/*.sv 2>/dev/null | wc -l | xargs echo "Sequence files:"
+          ls tb/test/*_test.sv 2>/dev/null | wc -l | xargs echo "Test files:"
 
   documentation:
     name: Documentation Check
@@ -77,16 +70,15 @@ jobs:
       - name: Check docs
         run: |
           echo "=== Documentation ==="
-          echo "README.md: $(test -f README.md && echo 'EXISTS' || echo 'MISSING')"
-          echo "ROADMAP.md: $(test -f ROADMAP.md && echo 'EXISTS' || echo 'MISSING')"
-          echo "CHANGELOG.md: $(test -f CHANGELOG.md && echo 'EXISTS' || echo 'MISSING')"
-          echo ""
-          echo "docs/ directory: $(test -d docs && echo 'EXISTS' || echo 'MISSING')"
+          test -f README.md && echo "README.md: EXISTS" || echo "README.md: MISSING"
+          test -f ROADMAP.md && echo "ROADMAP.md: EXISTS" || echo "ROADMAP.md: MISSING"
+          test -f CHANGELOG.md && echo "CHANGELOG.md: EXISTS" || echo "CHANGELOG.md: MISSING"
+          test -d docs && echo "docs/: EXISTS" || echo "docs/: MISSING"
       
       - name: Check test list
         run: |
           echo "=== Test List ==="
-          test -f regress/testlist.yaml && grep -E "^[a-z_]+:" regress/testlist.yaml | head -10 || echo "testlist.yaml not found"
+          test -f regress/testlist.yaml && cat regress/testlist.yaml | grep -E "^[a-z_]+:" | head -10 || echo "testlist.yaml not found"
 
   quality:
     name: Code Quality
@@ -99,17 +91,22 @@ jobs:
       - name: Code statistics
         run: |
           echo "=== Code Statistics ==="
-          echo "Total .sv files: $(find tb -name '*.sv' 2>/dev/null | wc -l)"
-          echo "Test cases: $(ls tb/test/*_test.sv 2>/dev/null | wc -l)"
-          echo "Sequences: $(ls tb/seq/*.sv 2>/dev/null | wc -l)"
-          echo "Components: $(ls tb/component/*.sv 2>/dev/null | wc -l)"
+          find tb -name "*.sv" 2>/dev/null | wc -l | xargs echo "Total .sv files:"
+          ls tb/test/*_test.sv 2>/dev/null | wc -l | xargs echo "Test cases:"
+          ls tb/seq/*.sv 2>/dev/null | wc -l | xargs echo "Sequences:"
+          ls tb/component/*.sv 2>/dev/null | wc -l | xargs echo "Components:"
       
-      - name: Check UVM compliance
+      - name: List files
         run: |
-          echo "=== UVM Compliance ==="
-          echo "axi_agent.sv uvm_component: $(grep -c 'uvm_component' tb/agent/axi_agent.sv 2>/dev/null || echo 0)"
-          echo "base_seq.sv uvm_sequence: $(grep -c 'uvm_sequence' tb/seq/base_seq.sv 2>/dev/null || echo 0)"
-          echo "scoreboard uvm_info: $(grep -c 'uvm_info' tb/component/uvm_scoreboard.sv 2>/dev/null || echo 0)"
+          echo "=== File Listing ==="
+          echo "Agent:"
+          ls tb/agent/*.sv 2>/dev/null || echo "  No files"
+          echo "Component:"
+          ls tb/component/*.sv 2>/dev/null || echo "  No files"
+          echo "Sequence:"
+          ls tb/seq/*.sv 2>/dev/null || echo "  No files"
+          echo "Test:"
+          ls tb/test/*_test.sv 2>/dev/null || echo "  No files"
 
   report:
     name: Generate Report
