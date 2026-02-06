@@ -1,0 +1,23 @@
+# ============================================================
+# File: docker-compose.yml
+# Description: Docker Compose 配置
+# Author: UVM Verification Platform
+# Created: 2026-02-06
+# ============================================================
+
+version: '3.8'
+
+services:
+  uvm-platform:
+    build: .
+    container_name: uvm-verification
+    volumes:
+      - .:/workspace
+      - uvm-cache:/root/.cache
+    working_dir: /workspace
+    command: tail -f /dev/null
+    environment:
+      - PROJECT_DIR=/workspace
+
+volumes:
+  uvm-cache:

@@ -251,3 +251,132 @@ ci-stats:
 	@git log --oneline 2>/dev/null | wc -l | xargs echo "  总提交数:"
 
 
+
+# ============================================================
+# 边界测试 (2026-02-06 新增)
+# ============================================================
+
+.PHONY: boundary_test
+boundary_test:
+	@echo ""
+	@echo "运行边界测试..."
+	$(MAKE) run TEST=axi_boundary_test
+
+.PHONY: all_tests_boundary
+all_tests_boundary: smoke_test base_test demo_test axi_single_test axi_burst_test axi_random_test axi_error_test axi_reg_test boundary_test
+	@echo ""
+	@echo "所有测试完成 (含边界测试)!"
+
+# ============================================================
+# Docker (2026-02-06 新增)
+# ============================================================
+
+.PHONY: docker-build docker-run docker-stop
+
+docker-build:
+	@echo "构建 Docker 镜像..."
+	docker build -t uvm-platform .
+
+docker-run:
+	@echo "运行 Docker 容器..."
+	docker-compose up -d
+
+docker-stop:
+	@echo "停止 Docker 容器..."
+	docker-compose down
+
+docker-bash:
+	@echo "进入 Docker 容器..."
+	docker-compose exec uvm-platform bash
+
+# ============================================================
+# 覆盖率报告 (2026-02-06 新增)
+# ============================================================
+
+.PHONY: coverage coverage-report
+
+coverage: compile
+	@echo "运行覆盖率测试..."
+	$(SIM_DIR)/$(SIM_TOOL)/run.sh +uvm_testname=smoke_test $(COV_FLAGS)
+
+coverage-report:
+	@echo "生成覆盖率报告..."
+	$(SCRIPTS_DIR)/coverage_report.sh -d ./coverage -o ./coverage_report
+
+# ============================================================
+# 波形查看 (2026-02-06 新增)
+# ============================================================
+
+.PHONY: wave-dump
+
+wave-dump:
+	@echo "生成波形 dump 代码..."
+	$(SCRIPTS_DIR)/wave/dump_waves.sh
+
+wave-view:
+	@echo "打开波形查看器..."
+ifeq ($(SIM_TOOL),vcs)
+	@echo "使用 DVE: dve -vpd waves.vpd &"
+else ifeq ($(SIM_TOOL),ncsim)
+	@echo "使用 IMC 查看覆盖率"
+endif
+
+# ============================================================
+# 帮助 (2026-02-06 更新)
+# ============================================================
+
+.PHONY: help
+help:
+	@echo ""
+	@echo "UVM Verification Platform - Makefile"
+	@echo "======================================"
+	@echo ""
+	@echo "使用方法: make <目标> [参数]"
+	@echo ""
+	@echo "编译目标:"
+	@echo "  compile          - 编译整个测试平台"
+	@echo "  compile_vcs      - 使用 VCS 编译"
+	@echo "  compile_ncsim    - 使用 NCsim 编译"
+	@echo ""
+	@echo "运行目标:"
+	@echo "  run [TEST=name]  - 运行指定测试"
+	@echo "  seed=[num]       - 指定随机种子"
+	@echo ""
+	@echo "测试目标:"
+	@echo "  smoke            - 运行冒烟测试"
+	@echo "  demo             - 运行演示测试"
+	@echo "  boundary_test    - 运行边界测试"
+	@echo "  all_tests        - 运行所有测试"
+	@echo "  all_tests_boundary - 运行所有测试 (含边界)"
+	@echo "  quick_test       - 快速测试 (P0 + P1)"
+	@echo "  stress_test      - 压力测试"
+	@echo ""
+	@echo "Docker:"
+	@echo "  docker-build      - 构建 Docker 镜像"
+	@echo "  docker-run       - 运行 Docker 容器"
+	@echo "  docker-stop      - 停止 Docker 容器"
+	@echo "  docker-bash      - 进入容器 bash"
+	@echo ""
+	@echo "覆盖率:"
+	@echo "  coverage         - 生成覆盖率"
+	@echo "  coverage-report  - 生成覆盖率报告"
+	@echo ""
+	@echo "波形:"
+	@echo "  wave-dump        - 生成波形 dump 代码"
+	@echo "  wave-view        - 查看波形"
+	@echo ""
+	@echo "回归测试:"
+	@echo "  regress          - 运行回归测试"
+	@echo ""
+	@echo "清理:"
+	@echo "  clean            - 清理仿真文件"
+	@echo "  distclean        - 清理所有生成文件"
+	@echo ""
+	@echo "示例:"
+	@echo "  make run TEST=smoke_test"
+	@echo "  make run TEST=demo_test SEED=12345"
+	@echo "  make boundary_test"
+	@echo "  make docker-build"
+	@echo ""
+
+
