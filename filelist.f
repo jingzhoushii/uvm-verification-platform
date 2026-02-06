@@ -30,3 +30,17 @@ $(SCRIPTS_DIR)/coverage_report.sh
 # ============================================================
 $(SCRIPTS_DIR)/parse_log.py
 $(REGRESS_DIR)/gen_html_report.py
+
+# ============================================================
+# AHB 总线 (2026-02-07 新增)
+# ============================================================
+$(TB_DIR)/seq/ahb_transaction.sv
+$(TB_DIR)/agent/ahb_agent.sv
+$(TB_DIR)/test/ahb_single_test.sv
+
+# ============================================================
+# APB 总线 (2026-02-07 新增)
+# ============================================================
+$(TB_DIR)/seq/apb_transaction.sv
+$(TB_DIR)/agent/apb_agent.sv
+$(TB_DIR)/test/apb_single_test.sv
