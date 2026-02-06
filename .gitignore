@@ -1,0 +1,64 @@
+# ============================================================
+# UVM Verification Platform - .gitignore
+# ============================================================
+
+# 编译产物
+*.o
+*.os
+*.so
+*.a
+*.dylib
+*.dll
+*.mod
+
+# 仿真输出
+simv*
+simv.daidir/
+simv.vdb/
+simv.proto/
+
+# 波形文件
+*.vcd
+*.fsdb
+*.vpd
+*.dump
+
+# 覆盖率
+*.acc
+*.ucd
+coverage/
+cov_work/
+vcs_cov.db/
+
+# 构建目录
+build/
+*.log
+
+# DVE/Verdi
+*.rc
+*.conf
+novas*
+verdi*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
+*.bak
+*~
+\#*\#

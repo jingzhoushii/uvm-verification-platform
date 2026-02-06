@@ -24,3 +24,9 @@ $(TB_DIR)/seq/axi_seq_lib.sv
 $(TB_DIR)/test/axi_boundary_test.sv
 $(SCRIPTS_DIR)/wave/dump_waves.sh
 $(SCRIPTS_DIR)/coverage_report.sh
+
+# ============================================================
+# 工具脚本 (2026-02-06 新增)
+# ============================================================
+$(SCRIPTS_DIR)/parse_log.py
+$(REGRESS_DIR)/gen_html_report.py

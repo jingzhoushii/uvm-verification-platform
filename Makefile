@@ -380,3 +380,57 @@ help:
 	@echo ""
 
 
+
+# ============================================================
+# 工具脚本 (2026-02-06 新增)
+# ============================================================
+
+.PHONY: parse-log gen-report
+
+parse-log:
+	@echo "解析仿真日志..."
+	python3 $(SCRIPTS_DIR)/parse_log.py sim/vcs/simv.log
+
+parse-log-custom:
+	@echo "解析自定义日志..."
+	python3 $(SCRIPTS_DIR)/parse_log.py $(LOG_FILE)
+
+gen-report:
+	@echo "生成 HTML 回归报告..."
+	python3 $(REGRESS_DIR)/gen_html_report.py regress/results regress/report.html
+	@echo "报告位置: regress/report.html"
+
+# ============================================================
+# 帮助 (2026-02-06 更新)
+# ============================================================
+
+.PHONY: help
+help:
+	@echo ""
+	@echo "UVM Verification Platform - Makefile"
+	@echo "======================================"
+	@echo ""
+	@echo "使用方法: make <目标> [参数]"
+	@echo ""
+	@echo "文档:"
+	@echo "  docs/zh/README.md  - 中文文档"
+	@echo "  docs/FAQ.md       - 常见问题"
+	@echo "  CONTRIBUTING.md    - 贡献指南"
+	@echo ""
+	@echo "测试:"
+	@echo "  make smoke              - 冒烟测试"
+	@echo "  make regress            - 回归测试"
+	@echo "  make boundary_test      - 边界测试"
+	@echo ""
+	@echo "工具:"
+	@echo "  make parse-log          - 解析日志"
+	@echo "  make gen-report         - 生成 HTML 报告"
+	@echo ""
+	@echo "Docker:"
+	@echo "  make docker-build       - 构建镜像"
+	@echo "  make docker-run         - 运行容器"
+	@echo ""
+	@echo "完整列表请查看 README.md"
+	@echo ""
+
+

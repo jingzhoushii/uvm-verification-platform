@@ -1,0 +1,26 @@
+# ============================================================
+# .gitattributes
+# ====================================
+
+# 自动检测文件类型
+* text=auto
+
+# SystemVerilog 文件
+*.sv linguist-language=SystemVerilog
+*.v linguist-language=Verilog
+
+# Shell 脚本
+*.sh linguist-language=Shell
+
+# 文档
+*.md linguist-documentation
+*.txt linguist-documentation
+
+# 忽略大文件统计
+*.vcd binary
+*.fsdb binary
+*.vpd binary
+
+# 合并策略
+*.sv merge=union
+*.v merge=union
