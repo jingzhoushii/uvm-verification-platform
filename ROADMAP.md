@@ -170,3 +170,62 @@ git push origin main
 | 边界测试 | 1 |
 | **总计** | **9** |
 
+
+---
+
+## V1.0.4 (2026-02-06) - 社区和文档
+
+### ✅ 已完成
+
+- [x] 社区文件
+  - [x] CONTRIBUTING.md: 贡献指南
+  - [x] LICENSE: MIT 许可证
+  - [x] .gitignore: Git 忽略规则
+  - [x] .editorconfig: 编辑器配置
+  - [x] .gitattributes: Git 属性
+  - [x] Issue 模板: Bug 报告、功能请求
+  - [x] PR 模板
+
+- [x] 多语言文档
+  - [x] 中文文档 (docs/zh/README.md)
+  - [x] 常见问题 (docs/FAQ.md)
+
+- [x] 工具脚本
+  - [x] parse_log.py: 日志分析
+  - [x] gen_html_report.py: HTML 报告
+
+### 项目统计
+
+| 类别 | 数量 |
+|------|------|
+| 测试用例 | 9 |
+| 序列 | 12 |
+| 文档 | 10+ |
+| 脚本 | 6 |
+| 社区文件 | 8 |
+
+### 完整功能清单
+
+| 功能 | 状态 |
+|------|------|
+| AXI4-Lite Agent | ✅ |
+| Scoreboard | ✅ |
+| Coverage | ✅ |
+| 9 个测试用例 | ✅ |
+| 12 个序列 | ✅ |
+| CI/CD | ✅ |
+| Docker | ✅ |
+| 波形 dump | ✅ |
+| 覆盖率报告 | ✅ |
+| 日志分析 | ✅ |
+| HTML 报告 | ✅ |
+| 中文文档 | ✅ |
+| 贡献指南 | ✅ |
+
+### 下一阶段
+
+**V1.1.0 目标**:
+- [ ] AHB/APB Adapter
+- [ ] 更多边界测试
+- [ ] 性能测试
+- [ ] 视频教程

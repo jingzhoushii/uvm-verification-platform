@@ -81,3 +81,28 @@
 
 ### Added
 - CODE_REVIEW.md: 代码审查报告
+
+## [1.0.4] - 2026-02-06
+
+### Added
+- 社区文件:
+  - CONTRIBUTING.md: 贡献指南
+  - LICENSE: MIT 许可证
+  - .gitignore: Git 忽略规则
+  - .editorconfig: 编辑器配置
+  - .gitattributes: Git 属性
+  - .github/ISSUE_TEMPLATE/bug_report.md: Bug 报告模板
+  - .github/ISSUE_TEMPLATE/feature_request.md: 功能请求模板
+  - .github/PULL_REQUEST_TEMPLATE.md: PR 模板
+
+- 文档:
+  - docs/zh/README.md: 中文文档
+  - docs/FAQ.md: 常见问题
+
+- 工具脚本:
+  - scripts/parse_log.py: 日志分析工具
+  - regress/gen_html_report.py: HTML 回归报告
+
+### Changed
+- Makefile: 添加 parse-log, gen-report 目标
+- filelist.f: 添加新脚本
