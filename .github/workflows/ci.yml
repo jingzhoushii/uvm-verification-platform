@@ -7,58 +7,40 @@ on:
     branches: [main]
   workflow_dispatch:
 
-env:
-  VCS_HOME: ${{ github.workspace }}/vcs
-  UVM_HOME: ${{ github.workspace }}/uvm-1800.2-2021
-
 jobs:
   lint:
     name: Syntax Check
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       
       - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential git
+        run: sudo apt-get update && sudo apt-get install -y build-essential git
       
       - name: Check file structure
         run: |
           echo "=== 检查文件结构 ==="
           ls -la
           echo ""
-          echo "Testbench 文件:"
-          find tb -name "*.sv" 2>/dev/null | head -20
+          echo "Testbench files:"
+          find tb -name "*.sv" 2>/dev/null || echo "No .sv files found"
           echo ""
-          [ -f Makefile ] && echo "Makefile: 存在" || echo "Makefile: 缺失"
-          [ -f filelist.f ] && echo "filelist.f: 存在" || echo "filelist.f: 缺失"
+          echo "Makefile: $(test -f Makefile && echo 'EXISTS' || echo 'MISSING')"
+          echo "filelist.f: $(test -f filelist.f && echo 'EXISTS' || echo 'MISSING')"
       
       - name: Check SystemVerilog files
         run: |
-          echo "=== SystemVerilog 语法检查 ==="
-          sv_count=$(find tb -name "*.sv" 2>/dev/null | wc -l)
-          echo "发现 ${sv_count} 个 .sv 文件"
-          echo ""
-          echo "文件列表:"
+          echo "=== SystemVerilog Files ==="
+          echo "Found $(find tb -name '*.sv' 2>/dev/null | wc -l) .sv files"
           find tb -name "*.sv" -o -name "*.v" 2>/dev/null | sort
       
-      - name: Validate YAML
+      - name: Validate YAML and Makefile
         run: |
-          echo "=== 检查 YAML 配置 ==="
-          if [ -f regress/testlist.yaml ]; then
-            echo "regress/testlist.yaml: 存在"
-            grep -E "^  [a-z_]+:" regress/testlist.yaml 2>/dev/null | head -10 || echo "  (无测试)"
-          else
-            echo "regress/testlist.yaml: 不存在"
-          fi
-      
-      - name: Validate Makefile
-        run: |
-          echo "=== 检查 Makefile ==="
-          grep -E "^[a-z_-]+:" Makefile 2>/dev/null | grep -v "^.PHONY" | head -15 || echo "  无目标"
+          echo "=== Configuration Files ==="
+          test -f regress/testlist.yaml && echo "testlist.yaml: EXISTS" || echo "testlist.yaml: MISSING"
+          echo "Makefile targets:"
+          grep -E "^[a-z_-]+:" Makefile 2>/dev/null | grep -v "^.PHONY" | head -10 || echo "No targets found"
 
   compile:
     name: Compile Check
@@ -66,38 +48,23 @@ jobs:
     needs: lint
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       
-      - name: Generate compile report
+      - name: Compile report
         run: |
-          echo "=== 编译检查报告 ==="
+          echo "=== Compile Report ==="
+          echo "Note: VCS/NCsim required for actual compilation"
           echo ""
-          echo "需要以下工具才能编译:"
-          echo "  - Synopsys VCS"
-          echo "  - Cadentium NCsim"
-          echo "  - Xcelium"
-          echo ""
-          echo "当前环境: GitHub Actions (无商业仿真器，跳过实际编译)"
-          echo ""
-          echo "=== 文件清单 ==="
-          cat filelist.f 2>/dev/null | grep -v "^#" | grep -v "^$" | head -20 || echo "  filelist.f 不存在"
+          echo "Files in filelist.f:"
+          cat filelist.f 2>/dev/null | grep -v "^#" | grep -v "^$" | head -15 || echo "filelist.f not found"
       
-      - name: List verification components
+      - name: List components
         run: |
-          echo "=== 验证组件清单 ==="
-          echo ""
-          echo "Agent:"
-          ls tb/agent/*.sv 2>/dev/null || echo "  无"
-          echo ""
-          echo "Component:"
-          ls tb/component/*.sv 2>/dev/null || echo "  无"
-          echo ""
-          echo "Sequence:"
-          ls tb/seq/*.sv 2>/dev/null || echo "  无"
-          echo ""
-          echo "Test:"
-          ls tb/test/*_test.sv 2>/dev/null || echo "  无"
+          echo "=== Components ==="
+          echo "Agent: $(ls tb/agent/*.sv 2>/dev/null | wc -l) files"
+          echo "Component: $(ls tb/component/*.sv 2>/dev/null | wc -l) files"
+          echo "Sequence: $(ls tb/seq/*.sv 2>/dev/null | wc -l) files"
+          echo "Test: $(ls tb/test/*_test.sv 2>/dev/null | wc -l) files"
 
   documentation:
     name: Documentation Check
@@ -105,30 +72,21 @@ jobs:
     needs: lint
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       
-      - name: Check documentation
+      - name: Check docs
         run: |
-          echo "=== 文档检查 ==="
+          echo "=== Documentation ==="
+          echo "README.md: $(test -f README.md && echo 'EXISTS' || echo 'MISSING')"
+          echo "ROADMAP.md: $(test -f ROADMAP.md && echo 'EXISTS' || echo 'MISSING')"
+          echo "CHANGELOG.md: $(test -f CHANGELOG.md && echo 'EXISTS' || echo 'MISSING')"
           echo ""
-          [ -f README.md ] && echo "README.md: 存在 ($(wc -l < README.md) 行)" || echo "README.md: 缺失"
-          [ -f ROADMAP.md ] && echo "ROADMAP.md: 存在 ($(wc -l < README.md) 行)" || echo "ROADMAP.md: 缺失"
-          [ -f CHANGELOG.md ] && echo "CHANGELOG.md: 存在 ($(wc -l < README.md) 行)" || echo "CHANGELOG.md: 缺失"
-          echo ""
-          echo "docs/:"
-          ls docs/ 2>/dev/null || echo "  无"
+          echo "docs/ directory: $(test -d docs && echo 'EXISTS' || echo 'MISSING')"
       
       - name: Check test list
         run: |
-          echo "=== 测试文档 ==="
-          if [ -f regress/testlist.yaml ]; then
-            echo "测试列表:"
-            grep -E "^  [a-z_]+:" regress/testlist.yaml 2>/dev/null || echo "  无"
-            grep "total_tests:" regress/testlist.yaml 2>/dev/null || echo "  无统计"
-          else
-            echo "testlist.yaml: 不存在"
-          fi
+          echo "=== Test List ==="
+          test -f regress/testlist.yaml && grep -E "^[a-z_]+:" regress/testlist.yaml | head -10 || echo "testlist.yaml not found"
 
   quality:
     name: Code Quality
@@ -136,56 +94,22 @@ jobs:
     needs: documentation
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       
       - name: Code statistics
         run: |
-          echo "=== 代码统计 ==="
-          echo ""
-          echo "代码文件:"
-          find tb -name "*.sv" 2>/dev/null | wc -l | xargs echo "  .sv 文件:"
-          echo "测试文件:"
-          find tb/test -name "*_test.sv" 2>/dev/null | wc -l | xargs echo "  测试:"
-          echo "序列文件:"
-          find tb/seq -name "*.sv" 2>/dev/null | wc -l | xargs echo "  序列:"
-          echo "组件文件:"
-          find tb/component -name "*.sv" 2>/dev/null | wc -l | xargs echo "  组件:"
-          echo ""
-          echo "Agent 文件:"
-          ls tb/agent/*.sv 2>/dev/null || echo "  无"
+          echo "=== Code Statistics ==="
+          echo "Total .sv files: $(find tb -name '*.sv' 2>/dev/null | wc -l)"
+          echo "Test cases: $(ls tb/test/*_test.sv 2>/dev/null | wc -l)"
+          echo "Sequences: $(ls tb/seq/*.sv 2>/dev/null | wc -l)"
+          echo "Components: $(ls tb/component/*.sv 2>/dev/null | wc -l)"
       
       - name: Check UVM compliance
         run: |
-          echo "=== UVM 合规检查 ==="
-          echo ""
-          
-          # 检查 axi_agent
-          if [ -f tb/agent/axi_agent.sv ]; then
-            count=$(grep -c "uvm_component" tb/agent/axi_agent.sv 2>/dev/null || echo 0)
-            echo "axi_agent.sv: ${count} 处 uvm_component"
-          else
-            echo "axi_agent.sv: 文件不存在"
-          fi
-          
-          # 检查 base_seq
-          if [ -f tb/seq/base_seq.sv ]; then
-            count=$(grep -c "uvm_sequence" tb/seq/base_seq.sv 2>/dev/null || echo 0)
-            echo "base_seq.sv: ${count} 处 uvm_sequence"
-          else
-            echo "base_seq.sv: 文件不存在"
-          fi
-          
-          # 检查 scoreboard
-          if [ -f tb/component/uvm_scoreboard.sv ]; then
-            count=$(grep -c "uvm_info" tb/component/uvm_scoreboard.sv 2>/dev/null || echo 0)
-            echo "uvm_scoreboard.sv: ${count} 处 uvm_info"
-          else
-            echo "uvm_scoreboard.sv: 文件不存在"
-          fi
-          
-          echo ""
-          echo "✅ UVM 合规检查完成"
+          echo "=== UVM Compliance ==="
+          echo "axi_agent.sv uvm_component: $(grep -c 'uvm_component' tb/agent/axi_agent.sv 2>/dev/null || echo 0)"
+          echo "base_seq.sv uvm_sequence: $(grep -c 'uvm_sequence' tb/seq/base_seq.sv 2>/dev/null || echo 0)"
+          echo "scoreboard uvm_info: $(grep -c 'uvm_info' tb/component/uvm_scoreboard.sv 2>/dev/null || echo 0)"
 
   report:
     name: Generate Report
@@ -194,21 +118,19 @@ jobs:
     if: always()
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       
-      - name: Generate summary
+      - name: Summary
         run: |
           echo "=========================================="
-          echo "  UVM Verification Platform - CI 报告"
+          echo "  UVM Verification Platform - CI Report"
           echo "=========================================="
           echo ""
-          echo "仓库: ${{ github.repository }}"
-          echo "分支: ${{ github.ref_name }}"
-          echo "提交: ${{ github.sha }}"
-          echo "时间: $(date)"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
           echo ""
-          echo "✅ CI/CD 检查通过!"
+          echo "All checks PASSED!"
           echo "=========================================="
       
       - name: Upload artifacts
