@@ -183,3 +183,71 @@ coverage_test: compile
 	$(MAKE) regress VERBOSE=1
 
 
+
+# ============================================================
+# CI/CD 检查 (2026-02-06 新增)
+# ============================================================
+
+.PHONY: ci-check ci-lint ci-doc ci-stats
+
+ci-check: ci-lint ci-doc ci-stats
+	@echo ""
+	@echo "=========================================="
+	@echo "CI 检查完成!"
+	@echo "=========================================="
+
+ci-lint:
+	@echo ""
+	@echo "=========================================="
+	@echo "  CI Lint 检查"
+	@echo "=========================================="
+	@echo ""
+	@echo "文件结构:"
+	@ls -la | head -5
+	@echo ""
+	@echo "Testbench 文件:"
+	@find tb -name "*.sv" 2>/dev/null | wc -l | xargs echo "  .sv 文件:"
+	@find tb -name "*.sv" 2>/dev/null | head -10
+	@echo ""
+	@echo "测试文件:"
+	@find tb/test -name "*_test.sv" 2>/dev/null | xargs echo "  "
+	@find tb/test -name "*_test.sv" 2>/dev/null
+	@echo ""
+	@echo "序列文件:"
+	@find tb/seq -name "*.sv" 2>/dev/null
+
+ci-doc:
+	@echo ""
+	@echo "=========================================="
+	@echo "  CI 文档检查"
+	@echo "=========================================="
+	@echo ""
+	@echo "README.md:       $(shell [ -f README.md ] && echo '✓' || echo '✗')"
+	@echo "ROADMAP.md:      $(shell [ -f ROADMAP.md ] && echo '✓' || echo '✗')"
+	@echo "CHANGELOG.md:    $(shell [ -f CHANGELOG.md ] && echo '✓' || echo '✗')"
+	@echo "filelist.f:      $(shell [ -f filelist.f ] && echo '✓' || echo '✗')"
+	@echo "regress/:        $(shell [ -d regress ] && echo '✓' || echo '✗')"
+	@echo "testlist.yaml:   $(shell [ -f regress/testlist.yaml ] && echo '✓' || echo '✗')"
+	@echo "docs/:           $(shell [ -d docs ] && echo '✓' || echo '✗')"
+
+ci-stats:
+	@echo ""
+	@echo "=========================================="
+	@echo "  CI 代码统计"
+	@echo "=========================================="
+	@echo ""
+	@echo "代码行数统计:"
+	@find . -name "*.sv" -o -name "*.v" | grep -v ".git" | xargs wc -l 2>/dev/null | tail -1 | xargs echo "  总计 .sv/.v:"
+	@echo ""
+	@echo "文件分类:"
+	@echo "  Testbench:  $$(find tb -name "*.sv" 2>/dev/null | wc -l | xargs) 个"
+	@echo "  测试用例:   $$(find tb/test -name "*_test.sv" 2>/dev/null | wc -l | xargs) 个"
+	@echo "  序列:       $$(find tb/seq -name "*.sv" 2>/dev/null | wc -l | xargs) 个"
+	@echo "  组件:       $$(find tb/component -name "*.sv" 2>/dev/null | wc -l | xargs) 个"
+	@echo "  Agent:      $$(find tb/agent -name "*.sv" 2>/dev/null | wc -l | xargs) 个"
+	@echo "  文档:       $$(find docs -name "*.md" 2>/dev/null | wc -l | xargs) 个"
+	@echo ""
+	@echo "Git 提交统计:"
+	@git log --oneline 2>/dev/null | wc -l | xargs echo "  总提交数:"
+
+

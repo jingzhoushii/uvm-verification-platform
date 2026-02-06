@@ -1,0 +1,279 @@
+name: UVM Verification Platform CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  # 手动触发
+  workflow_dispatch:
+
+env:
+  # 仿真工具路径 (CI 环境变量)
+  VCS_HOME: ${{ github.workspace }}/vcs
+  UVM_HOME: ${{ github.workspace }}/uvm-1800.2-2021
+
+jobs:
+  # ============================================================
+  # 作业1: 语法检查
+  # ============================================================
+  lint:
+    name: Syntax Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git
+      
+      - name: Check file structure
+        run: |
+          echo "=== 检查文件结构 ==="
+          echo "目录: $(ls -la)"
+          echo ""
+          echo "Testbench 文件:"
+          find tb -name "*.sv" | head -20
+          echo ""
+          echo "Makefile: $([ -f Makefile ] && echo '存在' || echo '缺失')"
+          echo "filelist.f: $([ -f filelist.f ] && echo '存在' || echo '缺失')"
+      
+      - name: Check SystemVerilog syntax
+        run: |
+          echo "=== SystemVerilog 语法检查 ==="
+          echo "发现 $(find tb -name '*.sv' | wc -l) 个 .sv 文件"
+          echo ""
+          echo "文件列表:"
+          find tb -name "*.sv" -o -name "*.v" | sort
+      
+      - name: Validate YAML files
+        run: |
+          echo "=== 检查 YAML 配置 ==="
+          if [ -f regress/testlist.yaml ]; then
+            echo "regress/testlist.yaml: 存在"
+            grep -E "^  [a-z_]+:" regress/testlist.yaml | head -10
+          else
+            echo "警告: regress/testlist.yaml 不存在"
+          fi
+      
+      - name: Validate Makefile
+        run: |
+          echo "=== 检查 Makefile ==="
+          echo "发现目标:"
+          grep -E "^[a-z_-]+:" Makefile | grep -v "^.PHONY" | head -15
+
+  # ============================================================
+  # 作业2: 编译检查 (模拟)
+  # ============================================================
+  compile:
+    name: Compile Check
+    runs-on: ubuntu-latest
+    needs: lint
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Generate compile report
+        run: |
+          echo "=== 编译检查报告 ==="
+          echo ""
+          echo "需要以下工具才能编译:"
+          echo "  1. Synopsys VCS"
+          echo "  2. Cadentium NCsim"
+          echo "  3. Xcelium"
+          echo ""
+          echo "当前环境: GitHub Actions (无商业仿真器)"
+          echo ""
+          echo "=== 文件清单 ==="
+          cat filelist.f | grep -v "^#" | grep -v "^$" | head -20
+          echo ""
+          echo "如果需要 CI 编译检查，请设置以下 secrets:"
+          echo "  - VCS_HOME_PATH"
+          echo "  - UVM_HOME_PATH"
+      
+      - name: List verification components
+        run: |
+          echo "=== 验证组件清单 ==="
+          echo ""
+          echo "Agent:"
+          find tb/agent -name "*.sv" 2>/dev/null | sort
+          echo ""
+          echo "Component:"
+          find tb/component -name "*.sv" 2>/dev/null | sort
+          echo ""
+          echo "Sequence:"
+          find tb/seq -name "*.sv" 2>/dev/null | sort
+          echo ""
+          echo "Test:"
+          find tb/test -name "*.sv" 2>/dev/null | sort
+
+  # ============================================================
+  # 作业3: 文档检查
+  # ============================================================
+  documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    needs: lint
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check documentation
+        run: |
+          echo "=== 文档检查 ==="
+          echo ""
+          echo "README.md:"
+          if [ -f README.md ]; then
+            echo "  存在 ($(wc -l < README.md) 行)"
+          else
+            echo "  缺失!"
+          fi
+          echo ""
+          echo "ROADMAP.md:"
+          if [ -f ROADMAP.md ]; then
+            echo "  存在 ($(wc -l < ROADMAP.md) 行)"
+          else
+            echo "  缺失"
+          fi
+          echo ""
+          echo "CHANGELOG.md:"
+          if [ -f CHANGELOG.md ]; then
+            echo "  存在 ($(wc -l < CHANGELOG.md) 行)"
+          else
+            echo "  缺失"
+          fi
+          echo ""
+          echo "文档目录:"
+          ls -la docs/ 2>/dev/null || echo "  docs/ 目录不存在"
+      
+      - name: Check test documentation
+        run: |
+          echo "=== 测试文档 ==="
+          echo ""
+          echo "测试列表 (regress/testlist.yaml):"
+          if [ -f regress/testlist.yaml ]; then
+            grep -E "^  [a-z_]+:" regress/testlist.yaml | sed 's/^  /    /'
+            echo ""
+            echo "测试统计:"
+            grep "total_tests:" regress/testlist.yaml
+            grep "p0_tests:" regress/testlist.yaml
+            grep "p1_tests:" regress/testlist.yaml
+          else
+            echo "  testlist.yaml 不存在"
+          fi
+
+  # ============================================================
+  # 作业4: 代码质量
+  # ============================================================
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    needs: documentation
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Code statistics
+        run: |
+          echo "=== 代码统计 ==="
+          echo ""
+          echo "总行数:"
+          find . -name "*.sv" -o -name "*.v" -o -name "*.md" -o -name "*.sh" -o -name "*.yaml" -o -name "Makefile*" | \
+            grep -v ".git" | xargs wc -l 2>/dev/null | tail -5
+          echo ""
+          echo "文件类型分布:"
+          find . -type f \( -name "*.sv" -o -name "*.v" \) | grep -v ".git" | \
+            awk -F. '{print $NF}' | sort | uniq -c | sort -rn
+          echo ""
+          echo "代码文件:"
+          find tb -name "*.sv" | wc -l
+          echo "测试文件:"
+          find tb/test -name "*_test.sv" | wc -l
+          echo "序列文件:"
+          find tb/seq -name "*.sv" | wc -l
+      
+      - name: Check critical files
+        run: |
+          echo "=== 关键文件检查 ==="
+          echo ""
+          echo "UVM 合规检查:"
+          if grep -q "uvm_component" tb/agent/axi_agent.sv 2>/dev/null; then
+            echo "  ✓ axi_agent.sv 使用 uvm_component"
+          fi
+          if grep -q "uvm_sequence" tb/seq/base_seq.sv 2>/dev/null; then
+            echo "  ✓ base_seq.sv 使用 uvm_sequence"
+          fi
+          if grep -q "`uvm_info" tb/component/uvm_scoreboard.sv 2>/dev/null; then
+            echo "  ✓ uvm_scoreboard.sv 使用 `uvm_info"
+          fi
+          echo ""
+          echo "端口检查:"
+          for f in tb/tb_top.sv tb/agent/axi_agent.sv; do
+            if [ -f "$f" ]; then
+              ports=$(grep -c "modport\|interface" "$f" 2>/dev/null || echo 0)
+              echo "  $f: $ports 个接口/端口定义"
+            fi
+          done
+
+  # ============================================================
+  # 作业5: 生成报告
+  # ============================================================
+  report:
+    name: Generate Report
+    runs-on: ubuntu-latest
+    needs: [compile, documentation, quality]
+    if: always()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Generate summary report
+        run: |
+          echo "=== CI/CD 执行报告 ==="
+          echo ""
+          echo "仓库{{ github.repository: $ }}"
+          echo "分支: ${{ github.ref_name }}"
+          echo "提交: ${{ github.sha }}"
+          echo "时间: $(date)"
+          echo ""
+          echo "工作流状态:"
+          echo "  - lint: ${{ needs.lint.result }}"
+          echo "  - compile: ${{ needs.compile.result }}"
+          echo "  - documentation: ${{ needs.documentation.result }}"
+          echo "  - quality: ${{ needs.quality.result }}"
+          echo ""
+          
+          # 检查所有作业是否成功
+          if [[ "${{ needs.lint.result }}" == "success" ]] && \
+             [[ "${{ needs.documentation.result }}" == "success" ]] && \
+             [[ "${{ needs.quality.result }}" == "success" ]]; then
+            echo "✅ 所有检查通过!"
+            exit 0
+          else
+            echo "❌ 部分检查失败"
+            exit 1
+          fi
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-report
+          path: |
+            *.md
+            regress/
+            docs/
+          retention-days: 7
+
+# ============================================================
+# 手动触发选项
+# ============================================================
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true

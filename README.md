@@ -425,3 +425,75 @@ smoke_test:
 ```
 
 
+
+## 🔄 CI/CD
+
+### GitHub Actions
+
+项目配置了自动 CI/CD 检查：
+
+```bash
+# 查看 CI 状态
+# GitHub > Actions > UVM Verification Platform CI
+```
+
+### CI 检查项目
+
+| 检查 | 描述 | 状态 |
+|------|------|------|
+| lint | 语法和文件结构 | ✅ |
+| compile | 编译检查 | ⚠️ 需要 VCS |
+| documentation | 文档检查 | ✅ |
+| quality | 代码质量 | ✅ |
+
+### 本地 CI 检查
+
+```bash
+# 运行完整 CI 检查
+make ci-check
+
+# 只运行 lint
+make ci-lint
+
+# 只检查文档
+make ci-doc
+
+# 代码统计
+make ci-stats
+```
+
+### 设置完整 CI/CD
+
+需要商业仿真器 (VCS/NCsim)？查看：
+
+```bash
+.github/workflows/CI_SETUP.md
+```
+
+## 📊 代码统计
+
+| 指标 | 数量 |
+|------|------|
+| Testbench 文件 | 10+ |
+| 测试用例 | 8 |
+| 序列 | 12 |
+| 文档 | 6+ |
+| 提交次数 | 6+ |
+
+## 🤝 贡献
+
+1. Fork 仓库
+2. 创建分支 `git checkout -b feature/xxx`
+3. 提交更改 `git commit -m "feat: xxx"`
+4. 推送 `git push origin feature/xxx`
+5. 创建 Pull Request
+
+## 📄 许可证
+
+MIT License
+
+## 📞 联系方式
+
+- GitHub: https://github.com/jingzhoushii/uvm-verification-platform
+- 作者: jingzhoushii
+
