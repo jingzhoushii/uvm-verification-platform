@@ -229,3 +229,38 @@ git push origin main
 - [ ] 更多边界测试
 - [ ] 性能测试
 - [ ] 视频教程
+
+---
+
+## V1.1.0 (2026-02-07) - AMBA 总线支持
+
+### ✅ 已完成
+
+- [x] AMBA 总线支持
+  - [x] AHB 总线
+    - [x] ahb_transaction.sv: 事务定义
+    - [x] ahb_agent.sv: Agent
+    - [x] ahb_single_test.sv: 测试
+  - [x] APB 总线
+    - [x] apb_transaction.sv: 事务定义
+    - [x] apb_agent.sv: Agent
+    - [x] apb_single_test.sv: 测试
+  - [x] docs/AMBA.md: 协议文档
+
+### 项目统计
+
+| 指标 | 数量 |
+|------|------|
+| 测试用例 | 11 |
+| 序列 | 12+ |
+| Agent | 3 (AXI/AHB/APB) |
+| 文档 | 12+ |
+
+### AMBA 生态系统
+
+| 总线 | 状态 | 组件 |
+|------|------|------|
+| AXI4-Lite | ✅ 完整 | Agent + 8 测试 + 7 序列 |
+| AHB | ✅ 基础 | Agent + 1 测试 |
+| APB | ✅ 基础 | Agent + 1 测试 |
+

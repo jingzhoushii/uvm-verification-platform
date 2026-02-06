@@ -106,3 +106,24 @@
 ### Changed
 - Makefile: 添加 parse-log, gen-report 目标
 - filelist.f: 添加新脚本
+
+## [1.1.0] - 2026-02-07
+
+### Added
+- AMBA 总线支持
+  - AHB (Advanced High-performance Bus) 支持
+    - ahb_transaction.sv: AHB 事务定义
+    - ahb_agent.sv: AHB Agent (Driver + Monitor + Sequencer)
+    - ahb_single_test.sv: AHB 测试用例
+  
+  - APB (Advanced Peripheral Bus) 支持
+    - apb_transaction.sv: APB 事务定义
+    - apb_agent.sv: APB Agent (Driver + Monitor + Sequencer)
+    - apb_single_test.sv: APB 测试用例
+
+- docs/AMBA.md: AMBA 总线协议文档
+
+### Changed
+- 测试用例总数: 11 (新增 AHB + APB 测试)
+- Agent 总数: 3 (AXI + AHB + APB)
+
