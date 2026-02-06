@@ -136,3 +136,37 @@ git push origin main
 
 **开始时间**: 2026-02-06  
 **预计完成**: 2026-03-06 (一个月)
+
+---
+
+## V1.0.3 (2026-02-06) - 完善基础设施
+
+### ✅ 已完成
+
+- [x] 边界测试用例
+- [x] 波形 dump 脚本
+- [x] 覆盖率报告脚本
+- [x] Docker 环境支持
+- [x] 代码审查报告
+
+### 新增 Makefile 目标
+
+| 目标 | 说明 |
+|------|------|
+| `make boundary_test` | 运行边界测试 |
+| `make docker-build` | 构建 Docker 镜像 |
+| `make docker-run` | 运行 Docker 容器 |
+| `make coverage` | 生成覆盖率 |
+| `make coverage-report` | 生成覆盖率报告 |
+| `make wave-dump` | 生成波形 dump 代码 |
+| `make all_tests_boundary` | 所有测试 (含边界) |
+
+### 测试用例统计
+
+| 类型 | 数量 |
+|------|------|
+| 基础测试 | 3 |
+| 功能测试 | 5 |
+| 边界测试 | 1 |
+| **总计** | **9** |
+

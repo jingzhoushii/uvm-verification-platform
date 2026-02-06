@@ -54,3 +54,30 @@
 [Unreleased]: https://github.com/jingzhoushii/uvm-verification-platform/compare/v1.0.1...HEAD
 [1.0.1]: https://github.com/jingzhoushii/uvm-verification-platform/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/jingzhoushii/uvm-verification-platform/releases/tag/v1.0.0
+
+## [1.0.3] - 2026-02-06
+
+### Added
+- 边界测试: axi_boundary_test.sv
+  - 地址对齐测试
+  - 最大/最小传输测试
+  - 跨 4KB 边界测试
+  - 保留地址测试
+
+- 工具脚本:
+  - scripts/wave/dump_waves.sh: 波形 dump
+  - scripts/coverage_report.sh: 覆盖率报告
+
+- Docker 支持:
+  - Dockerfile: 容器环境
+  - docker-compose.yml: 编排配置
+
+### Changed
+- Makefile: 添加新目标
+  - boundary_test: 边界测试
+  - docker-*: Docker 相关命令
+  - coverage-*: 覆盖率相关命令
+  - wave-*: 波形相关命令
+
+### Added
+- CODE_REVIEW.md: 代码审查报告
