@@ -1,0 +1,84 @@
+# ============================================================
+# File: testlist.yaml
+# Description: UVM 回归测试列表
+# Author: UVM Verification Platform
+# Created: 2026-02-06
+# ============================================================
+
+# 冒烟测试 (优先级最高)
+smoke_test:
+  name: smoke_test
+  desc: "冒烟测试，验证基本功能正常"
+  cmd: "./sim/vcs/run.sh +uvm_testname=smoke_test"
+  timeout: 300
+  passes: 1
+  priority: P0
+
+# 基础测试
+base_test:
+  name: base_test
+  desc: "基础测试类"
+  cmd: "./sim/vcs/run.sh +uvm_testname=base_test"
+  timeout: 300
+  passes: 1
+  priority: P1
+
+demo_test:
+  name: demo_test
+  desc: "功能演示测试"
+  cmd: "./sim/vcs/run.sh +uvm_testname=demo_test"
+  timeout: 600
+  passes: 1
+  priority: P1
+
+# 功能测试
+axi_single_test:
+  name: axi_single_test
+  desc: "AXI 单次传输测试"
+  cmd: "./sim/vcs/run.sh +uvm_testname=axi_single_test"
+  timeout: 600
+  passes: 1
+  priority: P1
+
+axi_burst_test:
+  name: axi_burst_test
+  desc: "AXI 突发传输测试"
+  cmd: "./sim/vcs/run.sh +uvm_testname=axi_burst_test"
+  timeout: 900
+  passes: 1
+  priority: P1
+
+axi_random_test:
+  name: axi_random_test
+  desc: "AXI 随机传输测试 (100次)"
+  cmd: "./sim/vcs/run.sh +uvm_testname=axi_random_test +test_count=100"
+  timeout: 1200
+  passes: 1
+  priority: P1
+
+axi_error_test:
+  name: axi_error_test
+  desc: "AXI 错误注入测试"
+  cmd: "./sim/vcs/run.sh +uvm_testname=axi_error_test"
+  timeout: 600
+  passes: 1
+  priority: P2
+
+axi_reg_test:
+  name: axi_reg_test
+  desc: "AXI 寄存器读写测试"
+  cmd: "./sim/vcs/run.sh +uvm_testname=axi_reg_test"
+  timeout: 600
+  passes: 1
+  priority: P1
+
+# 测试统计
+summary:
+  total_tests: 8
+  p0_tests: 1
+  p1_tests: 6
+  p2_tests: 1
+  
+  estimated_time:
+    smoke: 5min
+    full: 15min

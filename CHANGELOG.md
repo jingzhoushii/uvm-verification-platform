@@ -1,6 +1,25 @@
 # Changelog
 
 ## [Unreleased]
+## [1.0.2] - 2026-02-06
+
+### Added
+- 5个新的测试用例:
+  - axi_single_test: 单次传输测试
+  - axi_burst_test: 突发传输测试
+  - axi_random_test: 随机测试 (100次)
+  - axi_error_test: 错误注入测试
+  - axi_reg_test: 寄存器读写测试
+
+### Changed
+- 更新 filelist.f - 添加新测试文件
+
+### Fixed
+- N/A
+
+### Removed
+- N/A
+
 
 ## [1.0.1] - 2026-02-06
 

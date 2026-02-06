@@ -319,3 +319,109 @@ MIT License
 ---
 
 **Happy Verification! 🎉**
+
+## 🚀 快速开始
+
+### 1. 设置环境变量
+
+```bash
+export VCS_HOME=/path/to/vcs
+export UVM_HOME=/path/to/uvm-1800.2-2021
+```
+
+### 2. 编译
+
+```bash
+make compile
+```
+
+### 3. 运行冒烟测试
+
+```bash
+make smoke
+```
+
+### 4. 运行回归测试
+
+```bash
+make regress
+```
+
+## 📋 测试列表
+
+| 测试名称 | 描述 | 优先级 |
+|----------|------|--------|
+| smoke_test | 冒烟测试 | P0 |
+| base_test | 基础测试 | P1 |
+| demo_test | 功能演示 | P1 |
+| axi_single_test | 单次传输测试 | P1 |
+| axi_burst_test | 突发传输测试 | P1 |
+| axi_random_test | 随机测试 (100次) | P1 |
+| axi_error_test | 错误注入测试 | P2 |
+| axi_reg_test | 寄存器读写测试 | P1 |
+
+## 🔧 Makefile 使用
+
+```bash
+# 编译
+make compile
+
+# 运行单个测试
+make run TEST=smoke_test
+
+# 运行冒烟测试
+make smoke
+
+# 运行所有测试
+make regress
+
+# 快速测试 (P0 + P1)
+make quick_test
+
+# 压力测试
+make stress_test
+
+# 清理
+make clean
+make distclean
+```
+
+## 📊 回归测试
+
+### 运行回归测试
+
+```bash
+cd regress
+./run_regress.sh
+
+# 详细输出
+./run_regress.sh -v
+
+# 只运行冒烟测试
+./run_regress.sh --skip-compile
+
+# 运行特定测试
+./run_regress.sh -p "*smoke*"
+```
+
+### 测试结果
+
+测试结果保存在 `regress/results/` 目录：
+- `*.log` - 每个测试的日志
+- `summary.log` - 测试汇总
+- `report.html` - HTML 报告
+
+## 📝 测试配置
+
+测试配置在 `regress/testlist.yaml` 文件：
+
+```yaml
+smoke_test:
+  name: smoke_test
+  desc: "冒烟测试"
+  cmd: "./sim/vcs/run.sh +uvm_testname=smoke_test"
+  timeout: 300
+  priority: P0
+```
+
+

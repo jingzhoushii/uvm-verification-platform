@@ -137,3 +137,49 @@ distclean: clean
 	@echo "清理所有生成文件..."
 	rm -rf $(REGRESS_DIR)/results
 	rm -f $(COVERAGE_DIR)/*
+
+# ============================================================
+# 测试列表 (2026-02-06 新增)
+# ============================================================
+
+TEST_LIST = \
+    smoke_test \
+    base_test \
+    demo_test \
+    axi_single_test \
+    axi_burst_test \
+    axi_random_test \
+    axi_error_test \
+    axi_reg_test
+
+# 运行所有测试
+.PHONY: all_tests
+all_tests: $(TEST_LIST:%=run_%)
+	@echo ""
+	@echo "所有测试完成!"
+
+# 分别运行每个测试
+.PHONY: $(TEST_LIST)
+$(TEST_LIST):
+	@echo ""
+	@echo "运行测试: $@"
+	$(MAKE) run TEST=$@
+
+# 快速测试 (只运行 P0 和 P1)
+.PHONY: quick_test
+quick_test: smoke_test base_test demo_test axi_single_test axi_burst_test axi_reg_test
+	@echo ""
+	@echo "快速测试完成!"
+
+# 压力测试
+.PHONY: stress_test
+stress_test:
+	$(MAKE) run TEST=axi_random_test SEED=54321
+
+# 测试覆盖率
+.PHONY: coverage_test
+coverage_test: compile
+	@echo "运行覆盖率测试..."
+	$(MAKE) regress VERBOSE=1
+
+
